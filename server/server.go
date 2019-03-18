@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,9 +55,14 @@ func handleError(writer http.ResponseWriter, err error) {
 	http.Error(writer, err.Error(), http.StatusInternalServerError)
 }
 
-func Run() {
+func Run(port int) {
+
+	portString := strconv.Itoa(port)
+
+	log.Print("Configuring server...")
 	http.HandleFunc("/view/", viewHandler)
 	http.HandleFunc("/edit/", editHandler)
 	http.HandleFunc("/save/", saveHandler)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Print("Starting server on port " + portString)
+	log.Fatal(http.ListenAndServe(":"+portString, nil))
 }
