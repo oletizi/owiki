@@ -1,9 +1,9 @@
-package server_test
+package handlers_test
 
 import (
 	"fmt"
 	"github.com/magiconair/properties/assert"
-	"github.com/oletizi/owiki/internal/server"
+	"github.com/oletizi/owiki/internal/server/handlers"
 	"log"
 	"testing"
 )
@@ -15,7 +15,7 @@ var (
 
 func TestDecodeJsonGeneric(t *testing.T) {
 	var f interface{}
-	err := server.DecodeJson(j, &f)
+	err := handlers.DecodeJson(j, &f)
 	if err != nil {
 		t.Error(err)
 	}
@@ -31,7 +31,7 @@ func TestDecodeJsonStruct(t *testing.T) {
 	}
 
 	var b = JsonBody{}
-	err := server.DecodeJson(j, &b)
+	err := handlers.DecodeJson(j, &b)
 	if err != nil {
 		t.Error(err)
 	}
