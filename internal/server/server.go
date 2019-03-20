@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"github.com/oletizi/owiki/internal/page"
 	"html/template"
 	"io/ioutil"
@@ -8,6 +9,10 @@ import (
 	"net/http"
 	"strconv"
 )
+
+func DecodeJson(data []byte, decoded interface{}) error {
+	return json.Unmarshal(data, decoded)
+}
 
 func editHandler(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/edit/")
@@ -24,26 +29,28 @@ func titleFromPath(r *http.Request, prefix string) string {
 	return title
 }
 
-type body struct {
-	body string
-}
-
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	log.Print("in save handler...")
 	defer r.Body.Close()
+
+	type BodyText struct {
+		Body string
+	}
+
+	var bodyText BodyText
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		handleError(w, err)
 	}
 
-	log.Print("body:")
-	log.Print(body)
+	DecodeJson(body, &bodyText)
+	log.Print("body text: " + bodyText.Body)
 
 	title := titleFromPath(r, "/save/")
 	log.Print("title from path: " + title)
 
-	p := &page.Page{Title: title}
+	p := &page.Page{Title: title, Body: []byte(bodyText.Body)}
 
 	err = p.Save()
 
