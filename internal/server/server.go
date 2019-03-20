@@ -3,6 +3,7 @@ package server
 import (
 	"github.com/oletizi/owiki/internal/page"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -23,16 +24,34 @@ func titleFromPath(r *http.Request, prefix string) string {
 	return title
 }
 
+type body struct {
+	body string
+}
+
 func saveHandler(w http.ResponseWriter, r *http.Request) {
-	title := titleFromPath(r, "/save/")
-	body := r.Form.Get("body")
-	log.Print("body from form: " + body)
-	err := (&page.Page{Title: title, Body: []byte(body)}).Save()
+	log.Print("in save handler...")
+	defer r.Body.Close()
+
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		handleError(w, err)
-	} else {
-		http.Redirect(w, r, "/view/"+title, 302)
 	}
+
+	log.Print("body:")
+	log.Print(body)
+
+	title := titleFromPath(r, "/save/")
+	log.Print("title from path: " + title)
+
+	p := &page.Page{Title: title}
+
+	err = p.Save()
+
+	if err != nil {
+		handleError(w, err)
+		return
+	}
+	http.Redirect(w, r, "/view/"+title, 302)
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {

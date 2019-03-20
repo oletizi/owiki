@@ -14,12 +14,12 @@
             let text = $('#body').val();
             $.ajax('/save/{{.Title}}', {
                 method: 'POST',
-                data: {
+                data: JSON.stringify({
                     body: text
-                },
+                }),
                 success: function (data, status) {
                     console.log('Success!');
-                    window.location.href = '/view/{{.Title}}';
+                    //window.location.href = '/view/{{.Title}}';
                 },
                 error: function(error, status) {
                     console.log('error: ' + status);
