@@ -1,3 +1,5 @@
+// Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+
 package cmd
 
 import (

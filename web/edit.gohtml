@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+{{ template "head"}}
+<body>
+<div class="container">
+    <h1>Editing {{.Title}}</h1>
+    <textarea id="body">{{printf "%s" .Body}}</textarea><br>
+    <button id="save" class="btn btn-primary">Save</button>
+</div>
+<script>
+    $(document).ready(function () {
+        console.log('HERE!====');
+        $('#save').click(function () {
+            let text = $('#body').val();
+            $.ajax('/save/{{.Title}}', {
+                method: 'POST',
+                data: {
+                    body: text
+                },
+                success: function (data, status) {
+                    console.log('Success!');
+                    window.location.href = '/view/{{.Title}}';
+                },
+                error: function(error, status) {
+                    console.log('error: ' + status);
+                    console.log(error);
+                }
+            })
+        });
+    });
+</script>
+</body>
+</html>

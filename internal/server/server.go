@@ -1,7 +1,7 @@
 package server
 
 import (
-	"github.com/oletizi/owiki/page"
+	"github.com/oletizi/owiki/internal/page"
 	"html/template"
 	"log"
 	"net/http"
@@ -26,21 +26,27 @@ func titleFromPath(r *http.Request, prefix string) string {
 func saveHandler(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/save/")
 	body := r.Form.Get("body")
+	log.Print("body from form: " + body)
 	err := (&page.Page{Title: title, Body: []byte(body)}).Save()
 	if err != nil {
 		handleError(w, err)
+	} else {
+		http.Redirect(w, r, "/view/"+title, 302)
 	}
-	http.Redirect(w, r, "/view/"+title, 302)
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/view/")
-	p, _ := page.LoadPage(title)
-	renderTemplate(w, "view", p)
+	p, err := page.LoadPage(title)
+	if err != nil {
+		handleError(w, err)
+	} else {
+		renderTemplate(w, "view", p)
+	}
 }
 
 func renderTemplate(writer http.ResponseWriter, tmpl string, page *page.Page) {
-	t, err := template.ParseFiles(tmpl + ".html")
+	t, err := template.ParseFiles(getTemplatePath(tmpl), getTemplatePath("includes"))
 	if err != nil {
 		handleError(writer, err)
 		return
@@ -49,6 +55,10 @@ func renderTemplate(writer http.ResponseWriter, tmpl string, page *page.Page) {
 	if err != nil {
 		handleError(writer, err)
 	}
+}
+
+func getTemplatePath(tmpl string) string {
+	return "web/" + tmpl + ".gohtml"
 }
 
 func handleError(writer http.ResponseWriter, err error) {

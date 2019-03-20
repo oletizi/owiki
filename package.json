@@ -1,0 +1,25 @@
+{
+  "name": "owiki",
+  "version": "1.0.0",
+  "description": "Golang experiment",
+  "main": "js/main.js",
+  "dependencies": {},
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-copy": "^4.0.1",
+    "gulp-sass": "^4.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oletizi/owiki.git"
+  },
+  "author": "Orion Letizi",
+  "license": "UNLICENCED",
+  "bugs": {
+    "url": "https://github.com/oletizi/owiki/issues"
+  },
+  "homepage": "https://github.com/oletizi/owiki#readme"
+}
