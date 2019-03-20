@@ -9,7 +9,6 @@
 </div>
 <script>
     $(document).ready(function () {
-        console.log('HERE!====');
         $('#save').click(function () {
             let text = $('#body').val();
             $.ajax('/save/{{.Title}}', {
@@ -18,7 +17,6 @@
                     body: text
                 }),
                 success: function (data, status) {
-                    console.log('Success!');
                     window.location.href = '/view/{{.Title}}';
                 },
                 error: function(error, status) {

@@ -30,28 +30,21 @@ func titleFromPath(r *http.Request, prefix string) string {
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
-	log.Print("in save handler...")
-	defer r.Body.Close()
-
 	type BodyText struct {
 		Body string
 	}
 
-	var bodyText BodyText
+	defer r.Body.Close()
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		handleError(w, err)
 	}
 
+	var bodyText BodyText
 	DecodeJson(body, &bodyText)
-	log.Print("body text: " + bodyText.Body)
-
 	title := titleFromPath(r, "/save/")
-	log.Print("title from path: " + title)
-
 	p := &page.Page{Title: title, Body: []byte(bodyText.Body)}
-
 	err = p.Save()
 
 	if err != nil {
