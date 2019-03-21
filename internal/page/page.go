@@ -5,21 +5,46 @@ import (
 	"log"
 )
 
-type Page struct {
-	Title string
-	Body  []byte
+type Page interface {
+	Save() error
+	LoadPage() error
+	Title() string
+	Body() []byte
 }
 
-func (p *Page) Save() error {
-	filename := "/tmp/" + p.Title + ".txt"
+func NewPage(title string, body []byte) Page {
+	p := page{
+		title: title,
+		body:  body,
+	}
+	return &p
+}
+
+type page struct {
+	title string
+	body  []byte
+}
+
+func (p *page) Save() error {
+	filename := "/tmp/" + p.Title() + ".txt"
 	log.Print("saving file: " + filename)
-	log.Print("body text: " + string(p.Body))
-	return ioutil.WriteFile(filename, p.Body, 0600)
+	log.Print("body text: " + string(p.body))
+	return ioutil.WriteFile(filename, p.body, 0600)
 }
 
-func LoadPage(title string) (*Page, error) {
-	filename := "/tmp/" + title + ".txt"
+func (p *page) LoadPage() error {
+	filename := "/tmp/" + p.title + ".txt"
 	log.Print("loading file: " + filename)
 	body, err := ioutil.ReadFile(filename)
-	return &Page{Title: title, Body: body}, err
+	log.Print(err)
+	p.body = body
+	return err
+}
+
+func (p *page) Title() string {
+	return p.title
+}
+
+func (p *page) Body() []byte {
+	return p.body
 }
