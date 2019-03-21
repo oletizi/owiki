@@ -25,7 +25,7 @@ func (h *Handler) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Not found", http.StatusNotFound)
 	}
 
-	p := page.NewPage(title, nil)
+	p := h.config.PageFactory(title, nil)
 
 	// ignores the error; should probably have a mechanism for deciding if the page *should* be there and handle
 	// the error explicitly instead of implicitly assuming that an error loading the page means the doesn't exist yet.
@@ -34,7 +34,7 @@ func (h *Handler) HandleEdit(w http.ResponseWriter, r *http.Request) {
 	h.renderTemplate(w, "edit", &p)
 }
 
-func (*Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 	type BodyText struct {
 		Body string
 	}
@@ -49,7 +49,7 @@ func (*Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 	var bodyText BodyText
 	decodeJson(body, &bodyText)
 	title := titleFromPath(r, "/save/")
-	p := page.NewPage(title, []byte(bodyText.Body))
+	p := h.config.PageFactory(title, []byte(bodyText.Body))
 	err = p.Save()
 
 	if err != nil {
@@ -61,7 +61,7 @@ func (*Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) HandleView(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/view/")
-	p := page.NewPage(title, nil)
+	p := h.config.PageFactory(title, nil)
 	h.renderTemplate(w, "view", &p)
 }
 

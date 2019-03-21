@@ -3,6 +3,7 @@ package handler_test
 import (
 	"github.com/bxcodec/faker"
 	"github.com/magiconair/properties/assert"
+	"github.com/oletizi/owiki/internal/page"
 	"github.com/oletizi/owiki/internal/server/handler"
 	"io/ioutil"
 	"net/http"
@@ -41,6 +42,7 @@ func setup() {
 	config := handler.Config{
 		Docroot:      tmp,
 		TemplateRoot: tmp,
+		PageFactory:  page.NewPage,
 	}
 	h := handler.NewHandler(&config)
 	handleEdit = http.HandlerFunc(h.HandleEdit)

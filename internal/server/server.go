@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/oletizi/owiki/internal/page"
 	"github.com/oletizi/owiki/internal/server/handler"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ func Run(port int) {
 	config := handler.Config{
 		Docroot:      "./web",
 		TemplateRoot: "./web",
+		PageFactory:  page.NewPage,
 	}
 
 	h := handler.NewHandler(&config)
