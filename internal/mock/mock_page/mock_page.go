@@ -74,16 +74,16 @@ func (mr *MockPageMockRecorder) Title() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Title", reflect.TypeOf((*MockPage)(nil).Title))
 }
 
-// Body mocks base method
+// body mocks base method
 func (m *MockPage) Body() []byte {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "Body")
+	ret := m.ctrl.Call(m, "body")
 	ret0, _ := ret[0].([]byte)
 	return ret0
 }
 
-// Body indicates an expected call of Body
+// body indicates an expected call of body
 func (mr *MockPageMockRecorder) Body() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Body", reflect.TypeOf((*MockPage)(nil).Body))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "body", reflect.TypeOf((*MockPage)(nil).Body))
 }

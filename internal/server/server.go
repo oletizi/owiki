@@ -8,19 +8,23 @@ import (
 	"strconv"
 )
 
-func Run(port int) {
+func Run(port int, dataDir string) {
+
+	log.Print("Configuring server...")
+	pageConfig := &page.FilePageConfig{
+		DataDir: dataDir,
+	}
+	pageFactory := page.NewFilePageFactory(pageConfig)
 
 	portString := strconv.Itoa(port)
 
-	log.Print("Configuring server...")
-
-	config := handler.Config{
+	handlerConfig := handler.Config{
 		Docroot:      "./web",
 		TemplateRoot: "./web",
-		PageFactory:  page.NewPage,
+		PageFactory:  pageFactory,
 	}
 
-	h := handler.NewHandler(&config)
+	h := handler.NewHandler(&handlerConfig)
 
 	http.HandleFunc("/view/", h.HandleView)
 	http.HandleFunc("/edit/", h.HandleEdit)

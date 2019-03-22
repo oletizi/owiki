@@ -26,9 +26,12 @@ func (h *Handler) HandleEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	p := h.config.PageFactory(title, nil)
+	f := h.config.PageFactory
 
-	// XXX: ignores the error; should probably have a mechanism for deciding if the page *should* be there and handle
+	p := f.NewPage(title, nil)
+	//p := h.config.Factory(title, nil)
+
+	// XXX: ignores possible error; should probably have a mechanism for deciding if the page *should* be there and handle
 	// the error explicitly instead of implicitly assuming that an error loading the page means the doesn't exist yet.
 	p.LoadPage()
 
@@ -36,12 +39,11 @@ func (h *Handler) HandleEdit(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
-	type BodyText struct {
+	type DecodedPayload struct {
 		Body string
 	}
-	var body = []byte(`{ "body": "" }`)
-	var err error
-	var bodyText BodyText
+	var decodedPayload DecodedPayload
+	var pageBody = ""
 
 	title := titleFromPath(r, "/save/")
 	if title == "" {
@@ -51,18 +53,17 @@ func (h *Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 
 	if r.Body != nil {
 		defer r.Body.Close()
-		body, err = ioutil.ReadAll(r.Body)
+		body, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			handleError(w, err)
+			return
 		}
+		decodeJson(body, &decodedPayload)
+		pageBody = decodedPayload.Body
 	}
 
-	decodeJson(body, &bodyText)
-
-	log.Print("decoded body: " + bodyText.Body)
-
-	p := h.config.PageFactory(title, []byte(bodyText.Body))
-	err = p.Save()
+	p := h.config.PageFactory.NewPage(title, []byte(pageBody))
+	err := p.Save()
 
 	if err != nil {
 		handleError(w, err)
@@ -73,7 +74,7 @@ func (h *Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) HandleView(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/view/")
-	p := h.config.PageFactory(title, nil)
+	p := h.config.PageFactory.NewPage(title, nil)
 	h.renderTemplate(w, "view", &p)
 }
 

@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"fmt"
 	"github.com/bxcodec/faker"
 	"github.com/golang/mock/gomock"
 	"github.com/magiconair/properties/assert"
@@ -49,7 +50,7 @@ func setup() {
 	config = handler.Config{
 		Docroot:      tmp,
 		TemplateRoot: tmp,
-		PageFactory:  page.NewPage,
+		PageFactory:  nil,
 	}
 	h := handler.NewHandler(&config)
 	handleEdit = http.HandlerFunc(h.HandleEdit)
@@ -66,7 +67,7 @@ func TestHandler_HandleViewNoTitle(t *testing.T) {
 	defer ctrl.Finish()
 
 	// return
-	p.EXPECT().LoadPage().Return(nil)
+	p.EXPECT().LoadPage().Times(0)
 
 	req, err := http.NewRequest("GET", "/view/", nil)
 	if err != nil {
@@ -136,8 +137,9 @@ func TestHandler_HandleSaveWithTitleAndBody(t *testing.T) {
 	p.EXPECT().Save()
 
 	title := faker.Word()
-	body := "the body"
-	req, err := http.NewRequest("POST", "/save/"+title, strings.NewReader(body))
+	bodyText := "the Body"
+	jsonPayload := fmt.Sprintf(`{"Body": "%s"}`, bodyText)
+	req, err := http.NewRequest("POST", "/save/"+title, strings.NewReader(jsonPayload))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,17 +147,24 @@ func TestHandler_HandleSaveWithTitleAndBody(t *testing.T) {
 	handleSave.ServeHTTP(rr, req)
 	assert.Equal(t, rr.Code, http.StatusFound)
 	assert.Equal(t, p.Title(), title)
-	assert.Equal(t, p.Body(), []byte(body))
+	assert.Equal(t, p.Body(), []byte(bodyText))
 }
 
 func setupMockPage(t *testing.T) (*gomock.Controller, *mock_page.MockPage) {
 	ctrl := gomock.NewController(t)
 	p := mock_page.NewMockPage(ctrl)
-	config.PageFactory = func(title string, body []byte) page.Page {
-
-		p.EXPECT().Title().AnyTimes().Return(title)
-		p.EXPECT().Body().AnyTimes().Return(body)
-		return p
+	config.PageFactory = mockPageFactory{
+		p: p,
 	}
 	return ctrl, p
+}
+
+type mockPageFactory struct {
+	p *mock_page.MockPage
+}
+
+func (f mockPageFactory) NewPage(title string, body []byte) page.Page {
+	f.p.EXPECT().Title().AnyTimes().Return(title)
+	f.p.EXPECT().Body().AnyTimes().Return(body)
+	return f.p
 }

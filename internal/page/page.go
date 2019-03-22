@@ -5,6 +5,10 @@ import (
 	"log"
 )
 
+type Factory interface {
+	NewPage(title string, body []byte) Page
+}
+
 type Page interface {
 	Save() error
 	LoadPage() error
@@ -12,27 +16,44 @@ type Page interface {
 	Body() []byte
 }
 
-func NewPage(title string, body []byte) Page {
-	p := page{
-		title: title,
-		body:  body,
+type filePageFactory struct {
+	config *FilePageConfig
+}
+
+type FilePageConfig struct {
+	DataDir string
+}
+
+func NewFilePageFactory(config *FilePageConfig) Factory {
+	f := filePageFactory{
+		config: config,
+	}
+	return &f
+}
+
+func (f filePageFactory) NewPage(title string, body []byte) Page {
+	p := filePage{
+		title:  title,
+		body:   body,
+		config: f.config,
 	}
 	return &p
 }
 
-type page struct {
-	title string
-	body  []byte
+type filePage struct {
+	config *FilePageConfig
+	title  string
+	body   []byte
 }
 
-func (p *page) Save() error {
+func (p *filePage) Save() error {
 	filename := "/tmp/" + p.Title() + ".txt"
 	log.Print("saving file: " + filename)
 	log.Print("body text: " + string(p.body))
 	return ioutil.WriteFile(filename, p.body, 0600)
 }
 
-func (p *page) LoadPage() error {
+func (p *filePage) LoadPage() error {
 	filename := "/tmp/" + p.title + ".txt"
 	log.Print("loading file: " + filename)
 	body, err := ioutil.ReadFile(filename)
@@ -41,10 +62,10 @@ func (p *page) LoadPage() error {
 	return err
 }
 
-func (p *page) Title() string {
+func (p *filePage) Title() string {
 	return p.title
 }
 
-func (p *page) Body() []byte {
+func (p *filePage) Body() []byte {
 	return p.body
 }

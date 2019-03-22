@@ -15,11 +15,13 @@ var startCmd = &cobra.Command{
 	Long:  `Starts the web service on port 8080 or the specified port`,
 	Run: func(cmd *cobra.Command, args []string) {
 		port, _ := cmd.Flags().GetInt("port")
-		server.Run(port)
+		dataDir, _ := cmd.Flags().GetString("data-dir")
+		server.Run(port, dataDir)
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(startCmd)
 	startCmd.Flags().IntP("port", "p", 8080, "Port number")
+	startCmd.Flags().String("data-dir", "d", "Directory to store page data")
 }
