@@ -47,19 +47,23 @@ type filePage struct {
 }
 
 func (p *filePage) Save() error {
-	filename := "/tmp/" + p.Title() + ".txt"
+	filename := p.getFilename()
 	log.Print("saving file: " + filename)
 	log.Print("body text: " + string(p.body))
 	return ioutil.WriteFile(filename, p.body, 0600)
 }
 
 func (p *filePage) LoadPage() error {
-	filename := "/tmp/" + p.title + ".txt"
+	filename := p.getFilename()
 	log.Print("loading file: " + filename)
 	body, err := ioutil.ReadFile(filename)
 	log.Print(err)
 	p.body = body
 	return err
+}
+
+func (p *filePage) getFilename() string {
+	return p.config.DataDir + "/" + p.title + ".txt"
 }
 
 func (p *filePage) Title() string {

@@ -5,7 +5,7 @@
 <div class="container">
     <h1>{{.Title}}</h1>
     <p>[<a href="/edit/{{.Title}}">edit</a>]</p>
-    <div>{{printf "%s" .Body}}</div>
+    <div id="body">{{printf "%s" .Body}}</div>
 </div>
 {{ template "footer" }}
 </body>

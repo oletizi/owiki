@@ -75,6 +75,7 @@ func (h *Handler) HandleSave(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) HandleView(w http.ResponseWriter, r *http.Request) {
 	title := titleFromPath(r, "/view/")
 	p := h.config.PageFactory.NewPage(title, nil)
+	p.LoadPage()
 	h.renderTemplate(w, "view", &p)
 }
 

@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func Run(port int, dataDir string) {
+func Run(port int, dataDir string, docroot string, templateDir string) {
 
 	log.Print("Configuring server...")
 	pageConfig := &page.FilePageConfig{
@@ -19,8 +19,8 @@ func Run(port int, dataDir string) {
 	portString := strconv.Itoa(port)
 
 	handlerConfig := handler.Config{
-		Docroot:      "./web",
-		TemplateRoot: "./web",
+		Docroot:      docroot,
+		TemplateRoot: templateDir,
 		PageFactory:  pageFactory,
 	}
 
